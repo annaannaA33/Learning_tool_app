@@ -8,3 +8,16 @@ TODO: Verify question deletion functionality.
 Main menu: Users are prompted to enter the mode number, and the corresponding function is invoked.
 
 TODO: 
+TestMode
+
+TODO: 
+PracticeMode
+
+TODO: 
+View_statistics
+
+TODO:
+profile
+
+TODO:
+make it looks normall
