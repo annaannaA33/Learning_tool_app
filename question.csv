@@ -1,0 +1,5 @@
+id,question_type,question_text,expected_answer,options,correct_option,is_active
+1,multiple_choice_question_type,What is the capital of France?,,"['Berlin', 'Vilnius']",Paris,False
+2,free_form_question_type,What is the capital of Lithuania?,Vilnius,,,True
+3,free_form_question_type,what is the capital of Australia?,Canberra,,,True
+4,free_form_question_type,Do you know the capital of China?,Beijing,,,True
