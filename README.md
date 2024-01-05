@@ -8,16 +8,20 @@ TODO: Verify question deletion functionality.
 Main menu: Users are prompted to enter the mode number, and the corresponding function is invoked.
 
 TODO: 
-TestMode
+TestMode - implemented, but not work properly
 
 TODO: 
-PracticeMode
+PracticeMode - implemented, but not work properly
 
 TODO: 
-View_statistics
+View_statistics - implemented, but not work properly
+
 
 TODO:
 profile
 
 TODO:
 make it looks normall
+
+TODO:
+tests
