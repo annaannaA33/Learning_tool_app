@@ -7,6 +7,7 @@ from typing import Union
 import os
 import csv
 from tabulate import tabulate
+from datetime import datetime
 
 
 class FileManager:
@@ -77,21 +78,39 @@ class FileManager:
 
         return question_list
 
-
     def print_questions_table(self, questions):
-        data = []
+        # Prepare data for tabulation
 
+        # Table header
+        print("{:<5} {:<20} {:<10} {:<40} {:<10} {:<10} {:<15} {:<15} {:<15}".format(
+            "ID", "Type", "Active", "Question", "Practice", "Test", "Correct %", "Total Shown", "Total Correct"))
+
+        # Iterate through questions
         for question in questions:
-            data.append([question.id, question.question_type, question.get_question_text(), 
-                         getattr(question, 'expected_answer', None), getattr(question, 'options', None),
-                         getattr(question, 'correct_option', None), question.get_is_active()])
+            # Calculate the total number of times shown
+            total_shown = question.practice_count + question.test_count
 
-        headers = ['ID', 'Type', 'Text', 'Expected Answer', 'Options', 'Correct Option', 'Is Active']
+            # Calculate the percentage of correct answers
+            correct_percentage = (question.correct_count / total_shown) * 100 if total_shown > 0 else 0
 
-        table = tabulate(data, headers=headers, tablefmt='grid')
-        print(table)
+            # Display data in the table
+            print("{:<5} {:<20} {:<10} {:<40} {:<10} {:<10} {:<15.2f} {:<15} {:<15}".format(
+                question.id,
+                question.question_type,
+                "Yes" if question.is_active else "No",
+                question.question_text,
+                question.practice_count,
+                question.test_count,
+                correct_percentage,
+                total_shown,
+                question.correct_count))
 
-    # Question management mode: Enable/Disable/Delete questions
+        # Display overall statistics
+        print("\nTotal Correct Percentage: {:.2f}%".format(question.total_correct_percentage))
+        print("Total Questions: {}".format(question.total_questions))
+
+  
+     # Question management mode: Enable/Disable/Delete questions
     def question_activity_control(self):
         question_list_print = []
         question_list_print = self.load_questions_from_csv()
@@ -127,3 +146,24 @@ class FileManager:
                     print("Question not found. Enter a valid ID or 'main_menu' to return to the main menu.")
             except ValueError:
                 print("Invalid input. Please enter a valid ID or 'main_menu' to return to the main menu.")
+    
+    def save_test_results(self, result_string):
+        with open("results.txt", "a") as file:
+            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            file.write(f"{timestamp} - {result_string}\n")
+
+""" 
+    def print_questions_table(self, questions):
+        data = []
+
+        for question in questions:
+            data.append([question.id, question.question_type, question.get_question_text(), 
+                         getattr(question, 'expected_answer', None), getattr(question, 'options', None),
+                         getattr(question, 'correct_option', None), question.get_is_active()])
+
+        headers = ['ID', 'Type', 'Text', 'Expected Answer', 'Options', 'Correct Option', 'Is Active']
+
+        table = tabulate(data, headers=headers, tablefmt='grid')
+        print(table)
+
+ """         
