@@ -9,7 +9,6 @@ from random import choices
 def main():
   
     player = Player()
-    question = Question()
     file_manager = FileManager()
     question_manager = QuestionManager()   
 
@@ -33,10 +32,9 @@ def __init__(self, load_question_list):
 
 def start_practice(active_questions_list):
     while True:
-        one_question = Question()
-        
+        print("You are in practice mode")
         one_question = Question.random_chose_question(active_questions_list)
-        print(one_question.get_question_text())
+        #print(one_question.get_question_text())
         if not one_question:
             print("No active questions available for practice.")
             break
@@ -44,24 +42,23 @@ def start_practice(active_questions_list):
             print("для начала практики должно быть не менее 5 активных вопросов. Пожалуйста проверьте список вопросов.")
             break
 
-        user_answer = input(f"{question.get_question_text()}:\n ")
+        user_answer = input(f"{one_question.get_question_text()}:\n ")
 
         if user_answer.lower() == 'main_manu':
             #сохраняем статистику, идем в главное меню
             break
-        elif question.check_answer(one_question, user_answer) == True:
+        elif one_question.check_answer(one_question, user_answer) == True:
             print("Answer is correct")
         else: 
-            print("Answer is incorrect. Correct answer:", question.get_correct_answer())
+            print("Answer is incorrect. Correct answer:", one_question.get_correct_answer())
 
-        question.update_statistics()
+        one_question.update_statistics()
         
 
         #в конце вернем лист вопросов с обновленной статистикой, после выхода в главное меню, этот лист будет передан в меин фаил для обновления и загрузки в главный csv фаил
 
-def start_test(question_instance, active_questions_list):
+def start_test(active_questions_list):
     correct = 0
-
     print("You are in testing mode")
 
     while True:
@@ -72,7 +69,7 @@ def start_test(question_instance, active_questions_list):
             print("Invalid input. Please enter a valid number.")
 
     for _ in range(num_questions):
-        one_question = question_instance.random_chose_question(active_questions_list)
+        one_question = Question.random_chose_question(active_questions_list)
 
         if not one_question:
             print("No active questions available for testing.")
@@ -84,11 +81,11 @@ def start_test(question_instance, active_questions_list):
             print("Testing mode aborted. Returning to the main menu.")
             break
 
-        if question_instance.check_answer(one_question, user_answer):
+        if one_question.check_answer(one_question, user_answer):
             correct += 1
-            question_instance.update_statistics(True)
+            one_question.update_statistics(True)
         else: 
-            question_instance.update_statistics(False)
+            one_question.update_statistics(False)
 
     # Display test results
     accuracy_percentage = (correct / num_questions) * 100 if num_questions > 0 else 0
@@ -125,8 +122,14 @@ def main_manu(question_manager, file_manager):
                 print("You haven't saved any questions")
                     
         elif player_choice == '2':
-            file_manager.print_questions_table(questions)
-        elif player_choice == '3':   # Disable/Enable Questions
+            load_question_list = []
+            load_question_list = file_manager.load_questions_from_csv()
+            file_manager.print_questions_table(load_question_list)
+            # Display overall statistics
+            
+
+        elif player_choice == '3':   
+            # Disable/Enable Questions
             #print the questions from file manager
             file_manager.question_activity_control()
         elif player_choice == '4':   #practice
@@ -139,7 +142,12 @@ def main_manu(question_manager, file_manager):
             file_manager.save_questions_to_csv(updated_load_question_list)
 
         elif player_choice == '5':
-            start_test(question_instance, active_questions_list)
+            load_question_list = []
+            load_question_list = file_manager.load_questions_from_csv()
+            active_questions_list = Question.find_active_questions(load_question_list)
+            start_test(active_questions_list)
+            # Save с обновленной статистикой
+            updated_load_question_list = load_question_list 
             # Save results using FileManager
             file_manager.save_test_results(start_test.result_string)
 
