@@ -7,8 +7,7 @@ from typing import Union
 import os
 import csv
 from tabulate import tabulate
-from datetime import datetime
-
+from datetime import datetime, date, time
 
 class FileManager:
     def __init__(self):
@@ -104,10 +103,8 @@ class FileManager:
                 correct_percentage,
                 total_shown,
                 question.correct_count))
-
-        # Display overall statistics
-        print("\nTotal Correct Percentage: {:.2f}%".format(question.total_correct_percentage))
-        print("Total Questions: {}".format(question.total_questions))
+        total_questions = len(questions)
+        print(f"Total Questions: {total_questions}")
 
   
      # Question management mode: Enable/Disable/Delete questions
@@ -140,6 +137,7 @@ class FileManager:
                     elif switch_command.lower() == "delete":
                         question_list_print.remove(selected_question)
                         print(f"Question with ID {id_switch} has been deleted.")
+                        
                     else:
                         print("Invalid command. Please enter 'enable', 'disable', or 'delete'.")
                 else:
@@ -152,18 +150,3 @@ class FileManager:
             timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             file.write(f"{timestamp} - {result_string}\n")
 
-""" 
-    def print_questions_table(self, questions):
-        data = []
-
-        for question in questions:
-            data.append([question.id, question.question_type, question.get_question_text(), 
-                         getattr(question, 'expected_answer', None), getattr(question, 'options', None),
-                         getattr(question, 'correct_option', None), question.get_is_active()])
-
-        headers = ['ID', 'Type', 'Text', 'Expected Answer', 'Options', 'Correct Option', 'Is Active']
-
-        table = tabulate(data, headers=headers, tablefmt='grid')
-        print(table)
-
- """         
