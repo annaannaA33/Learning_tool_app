@@ -1,6 +1,7 @@
 from random import shuffle
 from FreeFormQuestion import FreeFormQuestion
 from MultipleChoiceQuestion import MultipleChoiceQuestion
+#from PracticeMode import PracticeMode
 from FileManager import FileManager
 from FreeFormQuestion import FreeFormQuestion
 from MultipleChoiceQuestion import MultipleChoiceQuestion
