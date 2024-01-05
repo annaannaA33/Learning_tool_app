@@ -1,32 +1,101 @@
 from Player import Player, welcome_player
 from FileManager import FileManager
 from QuestionManager import QuestionManager
-from PracticeMode import PracticeMode
+from Question import Question
+from random import choices
+#from PracticeMode import PracticeMode
 
 
-   
 def main():
+  
     player = Player()
+    question = Question()
     file_manager = FileManager()
-    question_manager = QuestionManager()
-    questions_list = question_manager.questions
+    question_manager = QuestionManager()   
 
+#practice_mode = PracticeMode(load_question_list)
+    questions_list = question_manager.questions
+    #question_inst - Question(question.id: int, question.question_type: str, question_text: str, is_active=True, practice_count=0, test_count=0, correct_count=0, total_questions = 0)
     #user_data = file_manager.load_user_data()
 
-    #if 'name' in user_data:
-   #     player.name = user_data['name']
     welcome_player(player)
     main_manu(question_manager, file_manager)
+    
+
+def __init__(self, load_question_list):
+    self.load_question_list = load_question_list
+    #if 'name' in user_data:
+#     player.name = user_data['name']
+    
+
+    
 
 
-def practice_mode():
-    pass
-    #practice = PracticeMode()
-    #practice.start_practice()
+def start_practice(active_questions_list):
+    while True:
+        one_question = Question()
+        
+        one_question = Question.random_chose_question(active_questions_list)
+        print(one_question.get_question_text())
+        if not one_question:
+            print("No active questions available for practice.")
+            break
+        if len(active_questions_list) > 5:
+            print("для начала практики должно быть не менее 5 активных вопросов. Пожалуйста проверьте список вопросов.")
+            break
 
-def test_mode_menu(self):
-    num_questions = int(input("Enter the number of questions for the test: "))
-    self.test_mode(num_questions)
+        user_answer = input(f"{question.get_question_text()}:\n ")
+
+        if user_answer.lower() == 'main_manu':
+            #сохраняем статистику, идем в главное меню
+            break
+        elif question.check_answer(one_question, user_answer) == True:
+            print("Answer is correct")
+        else: 
+            print("Answer is incorrect. Correct answer:", question.get_correct_answer())
+
+        question.update_statistics()
+        
+
+        #в конце вернем лист вопросов с обновленной статистикой, после выхода в главное меню, этот лист будет передан в меин фаил для обновления и загрузки в главный csv фаил
+
+def start_test(question_instance, active_questions_list):
+    correct = 0
+
+    print("You are in testing mode")
+
+    while True:
+        try:
+            num_questions = int(input("Enter the number of questions for the test: "))
+            break
+        except ValueError:
+            print("Invalid input. Please enter a valid number.")
+
+    for _ in range(num_questions):
+        one_question = question_instance.random_chose_question(active_questions_list)
+
+        if not one_question:
+            print("No active questions available for testing.")
+            break
+
+        user_answer = input(f"{one_question.get_question_text()}:\n ")
+
+        if user_answer.lower() == 'main_menu':
+            print("Testing mode aborted. Returning to the main menu.")
+            break
+
+        if question_instance.check_answer(one_question, user_answer):
+            correct += 1
+            question_instance.update_statistics(True)
+        else: 
+            question_instance.update_statistics(False)
+
+    # Display test results
+    accuracy_percentage = (correct / num_questions) * 100 if num_questions > 0 else 0
+    result_string = f"{accuracy_percentage:.2f}%"
+    print(f"Test completed. Correct answers: {correct}/{num_questions} ({result_string})")
+    return result_string
+
 
 
 def main_manu(question_manager, file_manager):
@@ -51,19 +120,29 @@ def main_manu(question_manager, file_manager):
             new_question_list = question_manager.add_question_menu()
             if len(new_question_list) > 0:
                 file_manager.save_questions_to_csv(new_question_list)
-                print(f"вы успешно добавили {len(new_question_list)} вопросов")
+                print("The list of questions has been successfully updated")
             else:
                 print("You haven't saved any questions")
-        #TODO              
+                    
         elif player_choice == '2':
-            question_manager.view_statistics()
+            file_manager.print_questions_table(questions)
         elif player_choice == '3':   # Disable/Enable Questions
-            #print the questions from json file manager
+            #print the questions from file manager
             file_manager.question_activity_control()
-        elif player_choice == '4':
-            practice_mode()
+        elif player_choice == '4':   #practice
+            load_question_list = []
+            load_question_list = file_manager.load_questions_from_csv()
+            active_questions_list = Question.find_active_questions(load_question_list)
+            start_practice(active_questions_list)
+            updated_load_question_list = load_question_list #с обновленной статистикой
+            #  получить обновленный список со статистикой и обновить:
+            file_manager.save_questions_to_csv(updated_load_question_list)
+
         elif player_choice == '5':
-            #test_mode_menu()
+            start_test(question_instance, active_questions_list)
+            # Save results using FileManager
+            file_manager.save_test_results(start_test.result_string)
+
             pass
 
         else:
@@ -74,9 +153,3 @@ if __name__ == "__main__":
     main()
     
             
-    
-
-      
-        
-
-
