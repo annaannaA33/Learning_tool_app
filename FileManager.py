@@ -8,6 +8,8 @@ import os
 import csv
 from tabulate import tabulate
 from datetime import datetime, date, time
+from colorama import Fore, Style
+
 
 class FileManager:
     def __init__(self):
@@ -79,35 +81,23 @@ class FileManager:
 
     def print_questions_table(self, questions):
         # Prepare data for tabulation
-
-        # Table header
-        print("{:<5} {:<20} {:<10} {:<40} {:<10} {:<10} {:<15} {:<15} {:<15}".format(
-            "ID", "Type", "Active", "Question", "Practice", "Test", "Correct %", "Total Shown", "Total Correct"))
-
-        # Iterate through questions
+        table_data = []
         for question in questions:
-            # Calculate the total number of times shown
             total_shown = question.practice_count + question.test_count
-
-            # Calculate the percentage of correct answers
             correct_percentage = (question.correct_count / total_shown) * 100 if total_shown > 0 else 0
 
-            # Display data in the table
-            print("{:<5} {:<20} {:<10} {:<40} {:<10} {:<10} {:<15.2f} {:<15} {:<15}".format(
-                question.id,
-                question.question_type,
-                "Yes" if question.is_active else "No",
-                question.question_text,
-                question.practice_count,
-                question.test_count,
-                correct_percentage,
-                total_shown,
-                question.correct_count))
-        total_questions = len(questions)
-        print(f"Total Questions: {total_questions}")
+            row = [question.id, question.question_type, "Yes" if question.is_active else "No",
+                question.question_text, question.practice_count, question.test_count,
+                f"{correct_percentage:.2f}", total_shown, question.correct_count]
 
-  
-     # Question management mode: Enable/Disable/Delete questions
+            table_data.append(row)
+
+        # Table header
+        headers = ["ID", "Type", "Active", "Question", "Practice", "Test", "Correct %", "Total Shown", "Total Correct"]
+        colored_headers = [f"{Fore.GREEN}{header}{Style.RESET_ALL}" for header in headers]
+        print(tabulate(table_data, headers=colored_headers, tablefmt="pretty"))
+
+    # Question management mode: Enable/Disable/Delete questions
     def question_activity_control(self):
         question_list_print = []
         question_list_print = self.load_questions_from_csv()
@@ -147,6 +137,5 @@ class FileManager:
     
     def save_test_results(self, result_string):
         with open("results.txt", "a") as file:
-            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            timestamp = datetime.date.today().isoformat()
             file.write(f"{timestamp} - {result_string}\n")
-
