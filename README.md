@@ -25,3 +25,7 @@ make it looks normall
 
 TODO:
 tests
+
+for srart:
+pip install tabulate
+
