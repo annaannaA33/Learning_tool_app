@@ -28,4 +28,4 @@ tests
 
 for srart:
 pip install tabulate
-
+открыть полностью терминал
