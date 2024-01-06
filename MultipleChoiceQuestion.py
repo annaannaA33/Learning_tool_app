@@ -11,11 +11,6 @@ class MultipleChoiceQuestion(Question):
     def get_correct_option(self):
         return self.correct_option
 
-    def update_statistics(self, load_question_list, is_correct):
-        super().update_statistics(load_question_list, is_correct)
-        # Доп действия для MultipleChoiceQuestion
-
- 
  
     def as_dict(self):
         return  {'id': id,#присваиваем порядковый номер в общем списке в файле, начиная с первого, 
