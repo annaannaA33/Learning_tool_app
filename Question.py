@@ -10,11 +10,11 @@ class Question:
         self.question_type = question_type
         self.question_text = question_text
         self.is_active = is_active
-        self.practice_count = practice_count   #сколько раз он отображался во время практики
-        self.test_count = test_count    #сколько раз он отображался во время тестирования
-        self.correct_count = correct_count   #количество правильных ответов на данный вопрос общий
-        self.total_correct_percentage = 0  # 
-        self.total_questions = 0 # обшее количество вопросов
+        self.practice_count = practice_count  # How many times it has been displayed during practice 
+        self.test_count = test_count    # How many times it has been displayed during testing
+        self.correct_count = correct_count  # Total number of correct answers for this question
+        self.total_correct_percentage = 0  # Overall percentage of correct answers
+        self.total_questions = 0 # Total number of questions
         
 
     def get_question_text(self):
@@ -65,7 +65,8 @@ class Question:
     @classmethod
     def find_active_questions(cls, load_question_list):
         active_questions_list = [question for question in load_question_list if question.is_active]
-        #проходимя по всем вопросам и выбираем активные, все добавляем в список
+        # Iterate through all questions and select the active ones 
+        # adding them to the list
         return active_questions_list
 
 
@@ -84,11 +85,11 @@ class Question:
         weights = [q.get_weight() for q in active_questions_list]
         randon_chosen_question = choices(active_questions_list, weights=weights, k=1).pop()
         return randon_chosen_question
-        #randon_chose_question  = выбираем вопрос из active_questions_list выбранный по условию задачи. 
-        #the questions are chosen in such a way that the questions that are answered correctly become less likely to appear, 
-        #while questions that are answered incorrectly become more likely to appear. 
-        #weighted random choices. 
-        #результаты статистики правильных овтетов должны соэраняться перед выходом из режима практики для проследующего использования. 
+        # randon_chose_question  = выбираем вопрос из active_questions_list выбранный по условию задачи. 
+        # the questions are chosen in such a way that the questions that are answered correctly become less likely to appear, 
+        # while questions that are answered incorrectly become more likely to appear. 
+        # weighted random choices. 
+        # The results of the statistics on correct answers should be stored
     
 
 
