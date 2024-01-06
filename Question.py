@@ -12,7 +12,7 @@ class Question:
         self.is_active = is_active
         self.practice_count = practice_count   #сколько раз он отображался во время практики
         self.test_count = test_count    #сколько раз он отображался во время тестирования
-        self.correct_count = correct_count   #процент правильных ответов на данный вопрос общий
+        self.correct_count = correct_count   #количество правильных ответов на данный вопрос общий
         self.total_correct_percentage = 0  # 
         self.total_questions = 0 # обшее количество вопросов
         
@@ -25,6 +25,12 @@ class Question:
     
     def get_total_questions(self):
         return self.total_questions
+    
+    def get_weight(self):
+        total_attempts = self.test_count + self.practice_count
+        incorrect_attempts = total_attempts - self.correct_count
+        return incorrect_attempts + 1 / (self.correct_count + 1)
+
 
     def update_statistics(self, load_question_list, is_correct):
         """
@@ -54,7 +60,8 @@ class Question:
 
         # If the question is not found, return the original list
         return load_question_list
-
+    
+    
     @classmethod
     def find_active_questions(cls, load_question_list):
         active_questions_list = [question for question in load_question_list if question.is_active]
@@ -75,8 +82,8 @@ class Question:
         if not active_questions_list:
             return None
         weights = [q.get_weight() for q in active_questions_list]
-        randon_chose_question = choices(active_questions_list, weights=weights, k=1).pop()
-        return randon_chose_question
+        randon_chosen_question = choices(active_questions_list, weights=weights, k=1).pop()
+        return randon_chosen_question
         #randon_chose_question  = выбираем вопрос из active_questions_list выбранный по условию задачи. 
         #the questions are chosen in such a way that the questions that are answered correctly become less likely to appear, 
         #while questions that are answered incorrectly become more likely to appear. 
