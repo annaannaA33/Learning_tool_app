@@ -3,7 +3,7 @@ from FileManager import FileManager
 from QuestionManager import QuestionManager
 from Question import Question
 from random import choices
-#from PracticeMode import PracticeMode
+import os
 
 
 def main():
@@ -12,9 +12,7 @@ def main():
     file_manager = FileManager()
     question_manager = QuestionManager()   
 
-#practice_mode = PracticeMode(load_question_list)
     questions_list = question_manager.questions
-    #question_inst - Question(question.id: int, question.question_type: str, question_text: str, is_active=True, practice_count=0, test_count=0, correct_count=0, total_questions = 0)
     #user_data = file_manager.load_user_data()
 
     welcome_player(player)
@@ -26,9 +24,9 @@ def __init__(self, load_question_list):
     #if 'name' in user_data:
 #     player.name = user_data['name']
     
-
-    
-
+def clear_terminal():
+    # does not work
+    print('\x1bc', end='')
 
 def start_practice(active_questions_list):
     while True:
@@ -39,13 +37,13 @@ def start_practice(active_questions_list):
             print("No active questions available for practice.")
             break
         if len(active_questions_list) > 5:
-            print("для начала практики должно быть не менее 5 активных вопросов. Пожалуйста проверьте список вопросов.")
+            print("To start practicing, there should be at least 5 active questions. Please check the questions list.")
             break
 
         user_answer = input(f"{one_question.get_question_text()}:\n ")
 
         if user_answer.lower() == 'main_manu':
-            #сохраняем статистику, идем в главное меню
+            # Save statistics and return to the main menu
             break
         elif one_question.check_answer(one_question, user_answer) == True:
             print("Answer is correct")
@@ -55,7 +53,8 @@ def start_practice(active_questions_list):
         one_question.update_statistics()
         
 
-        #в конце вернем лист вопросов с обновленной статистикой, после выхода в главное меню, этот лист будет передан в меин фаил для обновления и загрузки в главный csv фаил
+        # In the end, return the list of questions with updated statistics after returning to the main menu. 
+        #This list will be passed to the main file for updating and loading into the main CSV file
 
 def start_test(active_questions_list):
     correct = 0
@@ -95,8 +94,7 @@ def start_test(active_questions_list):
 
 
 
-def main_manu(question_manager, file_manager):
-    
+def print_ruls():
     print("Welcome! Rules and instructions: The program will keep running until you choose to stop."
         "Program Usage:\n"
         "1. Adding Questions: Select '1' to add quiz or free-form text questions. Questions are saved for future sessions.\n"
@@ -106,12 +104,38 @@ def main_manu(question_manager, file_manager):
         "5. Test Mode: Select '5' to take a test. Choose the number of questions, and receive a score with percentages.\n"
         "Note: At least 5 questions must be added before entering practice or test modes.\n\n"
         "To stop the program and save data, type 'stop' anytime. All data is automatically saved. ")
+    
+def print_menu():
+    menu_options = [
+        "1. Adding questions",
+        "2. Statistics viewing",
+        "3. Disable/enable questions",
+        "4. Practice mode",
+        "5. Test mode"
+    ]
 
+    max_length = max(len(option) for option in menu_options)
+
+    print(f"+{'-' * (max_length + 2)}+")
+    for option in menu_options:
+        padding = (max_length - len(option)) // 2
+        print(f"|{' ' * padding}{option}{' ' * (max_length - len(option) - padding)}|")
+    print(f"+{'-' * (max_length + 2)}+")
+
+
+
+def main_manu(question_manager, file_manager):
+    print_ruls()
+    
     while True:
+        clear_terminal()
+        print_menu()
         player_choice = input("Enter your choice: ")
         if player_choice.lower() == 'stop':
             print("Exiting the program. Goodbye!")
             break
+
+        # Add question, save question
         elif player_choice == '1':
             new_question_list = []
             new_question_list = question_manager.add_question_menu()
@@ -120,25 +144,26 @@ def main_manu(question_manager, file_manager):
                 print("The list of questions has been successfully updated")
             else:
                 print("You haven't saved any questions")
-                    
+
+        # Print the questions from file manager with statistics                
         elif player_choice == '2':
             load_question_list = []
             load_question_list = file_manager.load_questions_from_csv()
             file_manager.print_questions_table(load_question_list)
-            # Display overall statistics
             
-
+        # Disable/Enable Questions
         elif player_choice == '3':   
-            # Disable/Enable Questions
             #print the questions from file manager
             file_manager.question_activity_control()
-        elif player_choice == '4':   #practice
+
+        # Practice
+        elif player_choice == '4':   
             load_question_list = []
             load_question_list = file_manager.load_questions_from_csv()
             active_questions_list = Question.find_active_questions(load_question_list)
             start_practice(active_questions_list)
-            updated_load_question_list = load_question_list #с обновленной статистикой
-            #  получить обновленный список со статистикой и обновить:
+            updated_load_question_list = load_question_list # with updated statistics
+            # Get the updated list with statistics and update file with questions
             file_manager.save_questions_to_csv(updated_load_question_list)
 
         elif player_choice == '5':
@@ -146,7 +171,6 @@ def main_manu(question_manager, file_manager):
             load_question_list = file_manager.load_questions_from_csv()
             active_questions_list = Question.find_active_questions(load_question_list)
             start_test(active_questions_list)
-            # Save с обновленной статистикой
             updated_load_question_list = load_question_list 
             # Save results using FileManager
             file_manager.save_test_results(start_test.result_string)
