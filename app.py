@@ -56,25 +56,31 @@ def start_practice(active_questions_list):
         # In the end, return the list of questions with updated statistics after returning to the main menu. 
         #This list will be passed to the main file for updating and loading into the main CSV file
 
-def start_test(active_questions_list):
-    correct = 0
-    print("You are in testing mode")
+def check(questions_asked, active_questions_list):
+        while True:
+            one_question = Question.random_chose_question(active_questions_list)
+            if one_question not in questions_asked:
+                return one_question
 
+def start_test(load_question_list, active_questions_list):
+    correct = 0
+    questions_asked = set()
+    num_questions = 0
+    print("You are in testing mode")
+    
     while True:
         try:
             num_questions = int(input("Enter the number of questions for the test: "))
-            break
+            if num_questions <= len(active_questions_list):
+                break
         except ValueError:
-            print("Invalid input. Please enter a valid number.")
+            print("not anouth questions.")
 
-    for _ in range(num_questions):
-        one_question = Question.random_chose_question(active_questions_list)
-
-        if not one_question:
-            print("No active questions available for testing.")
-            break
-
-        user_answer = input(f"{one_question.get_question_text()}:\n ")
+        for _ in range(num_questions):
+            while True:
+                one_question = check(questions_asked, active_questions_list)
+                questions_asked.add(one_question)
+                user_answer = input(f"{one_question.get_question_text()}:\n ")
 
         if user_answer.lower() == 'main_menu':
             print("Testing mode aborted. Returning to the main menu.")
@@ -82,9 +88,9 @@ def start_test(active_questions_list):
 
         if one_question.check_answer(one_question, user_answer):
             correct += 1
-            one_question.update_statistics(True)
+            one_question.update_statistics(load_question_list, True)
         else: 
-            one_question.update_statistics(False)
+            one_question.update_statistics(load_question_list, False)
 
     # Display test results
     accuracy_percentage = (correct / num_questions) * 100 if num_questions > 0 else 0
@@ -128,7 +134,7 @@ def main_manu(question_manager, file_manager):
     print_ruls()
     
     while True:
-        clear_terminal()
+        
         print_menu()
         player_choice = input("Enter your choice: ")
         if player_choice.lower() == 'stop':
@@ -169,11 +175,14 @@ def main_manu(question_manager, file_manager):
         elif player_choice == '5':
             load_question_list = []
             load_question_list = file_manager.load_questions_from_csv()
+            print(load_question_list)
             active_questions_list = Question.find_active_questions(load_question_list)
-            start_test(active_questions_list)
+            print(active_questions_list)
+            result_string = start_test(load_question_list, active_questions_list)
+
             updated_load_question_list = load_question_list 
             # Save results using FileManager
-            file_manager.save_test_results(start_test.result_string)
+            file_manager.save_test_results(result_string)
 
             pass
 
