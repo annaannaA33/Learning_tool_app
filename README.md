@@ -22,7 +22,7 @@ profile
 
 TODO:
 make it looks normall
-
+Дя выхода из программы cntr + C
 TODO:
 tests
 
