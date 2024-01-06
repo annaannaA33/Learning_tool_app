@@ -1,7 +1,6 @@
 from random import shuffle
 from FreeFormQuestion import FreeFormQuestion
 from MultipleChoiceQuestion import MultipleChoiceQuestion
-#from PracticeMode import PracticeMode
 from FileManager import FileManager
 from FreeFormQuestion import FreeFormQuestion
 from MultipleChoiceQuestion import MultipleChoiceQuestion
@@ -13,7 +12,8 @@ class QuestionManager:
         
 
     def create_free_form_question(self, question_type, question_text):
-        #cпрашиваем question_text, expected_answer и если все заполнено, тогда все сохраняем в список  question_to_be_added    
+        # Ask for question_text and expected_answer, and if everything is ok
+        # then save everything in the question_to_be_added list   
         expected_answer = input("Enter the answer: ")
 
         new_question = FreeFormQuestion(
@@ -22,12 +22,13 @@ class QuestionManager:
             question_text=question_text,
             expected_answer=expected_answer
         )
-        #question_to_be_added.append(new_question(question_type, question_text, expected_answer))
+        
         return new_question
     
 
     def craete_multiple_choice_question(self, question_type, question_text):   
-        #cпрашиваем сколько ответов, варианты ответов, праильный вариант ответа и если все заполнено, все сохраняем в список  question_to_be_added 
+        # Ask for the number of options, answer options, correct answer option, and if everything is filled, 
+        # save everything in the question_to_be_added list 
         while True:
             num_options = int(input("Enter the number of answer options: "))
             if 1 >= int(num_options) <= 5:
@@ -44,7 +45,6 @@ class QuestionManager:
             options=options,
             correct_option=correct_option
         )
-
             print("You have prepared the question for saving.")
             return new_question
 
@@ -66,15 +66,14 @@ class QuestionManager:
                     if question_type == '1':
                         question_type = "free_form_question_type"
                         new_question = self.create_free_form_question(question_type, question_text)
-                        # когда вопрос сохранили выходим цикла, но не из функциию. пользователю опять предлагается ввести вопров, пока он не нажмет выход
                     elif question_type == '2':
                         question_type = "multiple_choice_question_type"
                         new_question = self.craete_multiple_choice_question(question_type, question_text)    
-                        # когда вопрос сохранили выходим цикла, но не из функциию. пользователю опять предлагается ввести вопров, пока он не нажмет выход
+                        # When the question is saved, exit the loop, but not the function. The user is prompted to enter a question again until they exit
                     question_to_be_added.append(new_question)
             elif question_type == "main_manu":
                 if len(question_to_be_added) > 0:
-                # если был добавлен в question_to_be_added хоть один вопрос, то возвращаем question_to_be_added[]    
+                # If at least one question was added to question_to_be_added, return question_to_be_added    
                     return question_to_be_added
             else:
                 print("Invalid question type.")
