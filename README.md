@@ -16,10 +16,6 @@ PracticeMode - implemented, but not work properly
 TODO: 
 View_statistics - implemented, but not work properly
 
-
-TODO:
-profile
-
 TODO:
 make it looks normall
 Дя выхода из программы cntr + C
