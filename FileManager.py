@@ -1,5 +1,4 @@
 from Question import Question
-import json
 import datetime
 from MultipleChoiceQuestion import MultipleChoiceQuestion
 from FreeFormQuestion import FreeFormQuestion
@@ -7,7 +6,6 @@ from typing import Union
 import os
 import csv
 from tabulate import tabulate
-from datetime import datetime, date, time
 from colorama import Fore, Style
 
 
@@ -35,69 +33,125 @@ class FileManager:
         # Save the updated list of questions to the file
         self.save_prepeared_questions_to_file(all_questions)
         
-
     def save_prepeared_questions_to_file(self, all_questions):
         with open(self.QUESTIONS_FILE, mode='w', newline='', encoding='utf-8') as file:
             writer = csv.writer(file)
-            writer.writerow(['id', 'question_type', 'question_text', 'expected_answer', 'options', 'correct_option', 'is_active'])
-            for question in all_questions:
-                writer.writerow([question.id, question.question_type, question.get_question_text(),
-                                 getattr(question, 'expected_answer', None), getattr(question, 'options', None),
-                                 getattr(question, 'correct_option', None), question.get_is_active()])
+            writer.writerow(['id', 'question_type', 'question_text', 'expected_answer', 'options', 'correct_option', 'is_active', 'appearance_count', 'correct_count', 'total_correct_percentage', 'total_questions'])
 
+            for question in all_questions:
+                row_data = {
+                    'id': question.id,
+                    'question_type': question.question_type,
+                    'question_text': question.get_question_text(),
+                    'expected_answer': getattr(question, 'expected_answer', None),
+                    'options': getattr(question, 'options', None),
+                    'correct_option': getattr(question, 'correct_option', None),
+                    'is_active': question.get_is_active(),
+                    'appearance_count': question.appearance_count,
+                    'correct_count': question.correct_count,
+                    'total_correct_percentage': question.total_correct_percentage,
+                    'total_questions': getattr(question, 'total_questions', None),
+                }
+
+                writer.writerow([row_data[field] for field in row_data])
 
     def load_questions_from_csv(self):
-        # Load questions from the file
+        # Загрузка вопросов из файла
         question_list = []
-        with open(self.QUESTIONS_FILE, mode='r', newline='', encoding='utf-8') as file:
+        with open("D:\\Python\\3pr\\Learning_tool_app\\questions.csv", mode='r', newline='', encoding='utf-8') as file:
             reader = csv.DictReader(file)
             for row in reader:
-                # Create a question object and add it to the list
+                question_type = row['question_type']
+                if question_type not in ['free_form_question_type', 'multiple_choice_question_type']:
+                    print(f"Ошибка: Неизвестный тип вопроса: {question_type}")
+                    continue
+
+                # Преобразование значений к нужным типам данных
+                id = int(row['id'])
+                question_type = row['question_type']
+                question_text = row['question_text']
+                is_active = row['is_active'].lower() == 'true'
+                appearance_count = int(row['appearance_count'])
+                correct_count = int(row['correct_count'])
+                total_correct_percentage = int(row['total_correct_percentage'])
+
+                # Создание объекта вопроса и добавление его в список
                 if row['question_type'] == 'free_form_question_type':
+                    expected_answer = row['expected_answer']
                     question = FreeFormQuestion(
-                        id=int(row['id']),
-                        question_type=row['question_type'],
-                        question_text=row['question_text'],
-                        expected_answer=row['expected_answer'],
-                        is_active=row['is_active'].lower() == 'true'
+                        id=id,
+                        question_type=question_type,
+                        question_text=question_text,
+                        expected_answer = expected_answer,
+                        is_active=is_active,
+                        appearance_count=appearance_count,
+                        correct_count=correct_count,
+                        total_correct_percentage=total_correct_percentage,
                     )
                 elif row['question_type'] == 'multiple_choice_question_type':
+                    options = row['options'].split(', ') if row['options'] else []                    
+                    correct_option = row['correct_option']
                     question = MultipleChoiceQuestion(
-                        id=int(row['id']),
-                        question_type=row['question_type'],
-                        question_text=row['question_text'],
-                        options=row['options'],
-                        correct_option=row['correct_option'],
-                        is_active=row['is_active'].lower() == 'true'
+                        id=id,
+                        question_type=question_type,
+                        question_text=question_text,
+                        options=options,
+                        correct_option=correct_option,
+                        is_active=is_active,
+                        appearance_count=appearance_count,
+                        correct_count=correct_count,
+                        total_correct_percentage=total_correct_percentage,
                     )
-                else:
-                    # Handle other question types
-                    question = None
-
-                if question:
                     question_list.append(question)
 
         return question_list
-
+  
+    '''
     def print_questions_table(self, questions):
         # Prepare data for tabulation
         table_data = []
         for question in questions:
-            total_shown = question.practice_count + question.test_count
-            correct_percentage = (question.correct_count / total_shown) * 100 if total_shown > 0 else 0
+            correct_percentage = (question.correct_count / question.appearance_count) * 100 if question.appearance_count > 0 else 0
 
-            row = [question.id, question.question_type, "Yes" if question.is_active else "No",
-                question.question_text, question.practice_count, question.test_count,
-                f"{correct_percentage:.2f}", total_shown, question.correct_count]
+            row = [question.id, question.question_type, question.question_text, 
+                   "Yes" if question.is_active else "No",
+                question.appearance_count, 
+                f"{correct_percentage:.2f}", question.correct_count]
 
             table_data.append(row)
 
         # Table header
-        headers = ["ID", "Type", "Active", "Question", "Practice", "Test", "Correct %", "Total Shown", "Total Correct"]
+        headers = ["ID", "Type", "Question", "Active", "Appearance_count", "Correct %", "Total Correct"]
         colored_headers = [f"{Fore.GREEN}{header}{Style.RESET_ALL}" for header in headers]
+
         print(tabulate(table_data, headers=colored_headers, tablefmt="pretty"))
 
     # Question management mode: Enable/Disable/Delete questions
+    '''
+    def print_questions_table(self, questions):
+        # Prepare data for tabulation
+        table_data = []
+        for question in questions:
+            correct_percentage = (question.correct_count / question.appearance_count) * 100 if question.appearance_count > 0 else 0
+
+            # Используем пустую строку, если атрибут отсутствует
+            expected_answer = getattr(question, 'expected_answer', '')
+            options = ', '.join(getattr(question, 'options', []))
+            correct_option = getattr(question, 'correct_option', '')
+
+            row = [question.id, question.question_type, "Yes" if question.is_active else "No",
+                question.question_text, expected_answer, options, correct_option,
+                question.appearance_count, f"{correct_percentage:.2f}", question.correct_count]
+
+            table_data.append(row)
+
+        # Table header
+        headers = ["ID", "Type", "Active", "Question", "Expected Answer", "Options", "Correct Option",
+                "Appearance Count", "Correct %", "Total Correct"]
+        colored_headers = [f"{Fore.GREEN}{header}{Style.RESET_ALL}" for header in headers]
+        print(tabulate(table_data, headers=colored_headers, tablefmt="pretty"))
+
+
     def question_activity_control(self):
         question_list_print = []
         question_list_print = self.load_questions_from_csv()
@@ -137,5 +191,6 @@ class FileManager:
     
     def save_test_results(self, result_string):
         with open("results.txt", "a") as file:
-            timestamp = datetime.date.today().isoformat()
-            file.write(f"{timestamp} - {result_string}\n")
+            timestamp = datetime.datetime.now().isoformat()
+            file.write(f"{timestamp} - {result_string}\n")           
+
