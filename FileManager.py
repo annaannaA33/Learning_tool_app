@@ -5,6 +5,7 @@ from FreeFormQuestion import FreeFormQuestion
 from typing import Union
 import os
 import csv
+import ast  # additional import KATYA
 from tabulate import tabulate
 from colorama import Fore, Style
 
@@ -58,7 +59,8 @@ class FileManager:
     def load_questions_from_csv(self):
         # Загрузка вопросов из файла
         question_list = []
-        with open("D:\\Python\\3pr\\Learning_tool_app\\questions.csv", mode='r', newline='', encoding='utf-8') as file:
+
+        with open(self.QUESTIONS_FILE, mode='r', newline='', encoding='utf-8') as file:
             reader = csv.DictReader(file)
             for row in reader:
                 question_type = row['question_type']
@@ -91,7 +93,8 @@ class FileManager:
                     question_list.append(question)
 
                 elif row['question_type'] == 'multiple_choice_question_type':
-                    options = row['options'].split(', ') if row['options'] else []                    
+
+                    options = ast.literal_eval(row['options']) if row['options'] else []
                     correct_option = row['correct_option']
                     question = MultipleChoiceQuestion(
                         id=id,
