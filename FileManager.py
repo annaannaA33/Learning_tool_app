@@ -88,6 +88,8 @@ class FileManager:
                         correct_count=correct_count,
                         total_correct_percentage=total_correct_percentage,
                     )
+                    question_list.append(question)
+
                 elif row['question_type'] == 'multiple_choice_question_type':
                     options = row['options'].split(', ') if row['options'] else []                    
                     correct_option = row['correct_option']
@@ -105,29 +107,7 @@ class FileManager:
                     question_list.append(question)
 
         return question_list
-  
-    '''
-    def print_questions_table(self, questions):
-        # Prepare data for tabulation
-        table_data = []
-        for question in questions:
-            correct_percentage = (question.correct_count / question.appearance_count) * 100 if question.appearance_count > 0 else 0
-
-            row = [question.id, question.question_type, question.question_text, 
-                   "Yes" if question.is_active else "No",
-                question.appearance_count, 
-                f"{correct_percentage:.2f}", question.correct_count]
-
-            table_data.append(row)
-
-        # Table header
-        headers = ["ID", "Type", "Question", "Active", "Appearance_count", "Correct %", "Total Correct"]
-        colored_headers = [f"{Fore.GREEN}{header}{Style.RESET_ALL}" for header in headers]
-
-        print(tabulate(table_data, headers=colored_headers, tablefmt="pretty"))
-
-    # Question management mode: Enable/Disable/Delete questions
-    '''
+ 
     def print_questions_table(self, questions):
         # Prepare data for tabulation
         table_data = []
