@@ -182,9 +182,9 @@ def main_manu(question_manager, file_manager):
             updated_load_question_list = load_question_list 
             # Save results using FileManager
             file_manager.save_test_results(result_string)
+            file_manager.save_questions_to_csv(load_question_list)
 
-            pass
-
+            
         else:
             print("Invalid choice. Please choose a valid option.") 
 
