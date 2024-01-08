@@ -18,21 +18,31 @@ class FileManager:
 
     def save_questions_to_csv(self, new_question_list):
         existing_questions = []
+        all_updated_questions = []
 
         # Check if the questions file exists
         if os.path.exists(self.QUESTIONS_FILE) and os.stat(self.QUESTIONS_FILE).st_size != 0:
             # f the file exists and is not empty, load the questions
             existing_questions = self.load_questions_from_csv()
-
-        # Merge old and new questions
-        all_questions = existing_questions + new_question_list
+            for one_existing_question in existing_questions:
+                for one_new_question in new_question_list:
+                    if one_existing_question.question_type == one_new_question.question_type and one_existing_question.question_text == one_new_question.question_text:
+                        one_existing_question.appearance_count += one_new_question.appearance_count
+                        one_existing_question.correct_count += one_new_question.correct_count
+                        one_existing_question.total_correct_percentage += one_new_question.total_correct_percentage
+                        if one_existing_question not in all_updated_questions: 
+                            all_updated_questions.append(one_existing_question)
+                        
+                    else:
+                        if one_existing_question not in all_updated_questions: 
+                            all_updated_questions.append(one_existing_question)
 
         # Assign unique IDs
-        for i, question in enumerate(all_questions, start=1):
+        for i, question in enumerate(all_updated_questions, start=1):
             question.id = i
 
         # Save the updated list of questions to the file
-        self.save_prepeared_questions_to_file(all_questions)
+        self.save_prepeared_questions_to_file(all_updated_questions)
         
     def save_prepeared_questions_to_file(self, all_questions):
         with open(self.QUESTIONS_FILE, mode='w', newline='', encoding='utf-8') as file:
@@ -75,7 +85,7 @@ class FileManager:
                 is_active = row['is_active'].lower() == 'true'
                 appearance_count = int(row['appearance_count'])
                 correct_count = int(row['correct_count'])
-                total_correct_percentage = int(row['total_correct_percentage'])
+                total_correct_percentage = round(float(row['total_correct_percentage']))
 
                 # Создание объекта вопроса и добавление его в список
                 if row['question_type'] == 'free_form_question_type':
