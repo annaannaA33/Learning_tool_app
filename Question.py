@@ -38,7 +38,7 @@ class Question:
                 question.appearance_count +=1
                 if is_correct:
                     question.correct_count += 1
-                    question.total_correct_percentage = (question.correct_count / total_questions) * 100 if total_questions > 0 else 0
+                    question.total_correct_percentage = round((question.correct_count / total_questions) * 100) if total_questions > 0 else 0
 
                 # Return the updated list of questions
                 return load_question_list
