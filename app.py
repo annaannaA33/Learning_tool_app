@@ -12,7 +12,7 @@ def main():
     file_manager = FileManager()
     question_manager = QuestionManager()   
 
-    questions_list = question_manager.questions
+    #questions_list = question_manager.questions
     #user_data = file_manager.load_user_data()
 
     welcome_player(player)
@@ -76,21 +76,21 @@ def start_test(load_question_list, active_questions_list):
         except ValueError:
             print("not anouth questions.")
 
-        for _ in range(num_questions):
-            while True:
-                one_question = check(questions_asked, active_questions_list)
-                questions_asked.add(one_question)
-                user_answer = input(f"{one_question.get_question_text()}:\n ")
+    for _ in range(num_questions):
 
+        one_question = check(questions_asked, active_questions_list)
+        questions_asked.add(one_question)
+        user_answer = input(f"{one_question.get_question_text()}:\n ")
+        
         if user_answer.lower() == 'main_menu':
             print("Testing mode aborted. Returning to the main menu.")
             break
-
         if one_question.check_answer(one_question, user_answer):
             correct += 1
             one_question.update_statistics(load_question_list, True)
         else: 
             one_question.update_statistics(load_question_list, False)
+
 
     # Display test results
     accuracy_percentage = (correct / num_questions) * 100 if num_questions > 0 else 0
@@ -156,13 +156,14 @@ def main_manu(question_manager, file_manager):
             load_question_list = []
             load_question_list = file_manager.load_questions_from_csv()
             file_manager.print_questions_table(load_question_list)
+
             
         # Disable/Enable Questions
         elif player_choice == '3':   
             #print the questions from file manager
             file_manager.question_activity_control()
 
-        # Practice
+        # Practice_mood
         elif player_choice == '4':   
             load_question_list = []
             load_question_list = file_manager.load_questions_from_csv()
@@ -171,13 +172,11 @@ def main_manu(question_manager, file_manager):
             updated_load_question_list = load_question_list # with updated statistics
             # Get the updated list with statistics and update file with questions
             file_manager.save_questions_to_csv(updated_load_question_list)
-
+        # Test_mood
         elif player_choice == '5':
             load_question_list = []
             load_question_list = file_manager.load_questions_from_csv()
-            print(load_question_list)
             active_questions_list = Question.find_active_questions(load_question_list)
-            print(active_questions_list)
             result_string = start_test(load_question_list, active_questions_list)
 
             updated_load_question_list = load_question_list 
