@@ -1,5 +1,6 @@
-id,question_type,question_text,expected_answer,options,correct_option,is_active
-1,multiple_choice_question_type,What is the capital of France?,,"['Berlin', 'Vilnius']",Paris,False
-2,free_form_question_type,What is the capital of Lithuania?,Vilnius,,,True
-3,free_form_question_type,what is the capital of Australia?,Canberra,,,True
-4,free_form_question_type,Do you know the capital of China?,Beijing,,,True
+id,question_type,question_text,expected_answer,options,correct_option,is_active,appearance_count,correct_count,total_correct_percentage,total_questions
+1,multiple_choice_question_type,What is the largest planet in our solar system?,,"['[""[\'Earth\'""', '""\'Mars\']""]']",Jupiter,True,0,0,0,0
+2,free_form_question_type,What is the capital of Lithuania?,Vilnius,,,True,0,0,0,0
+3,multiple_choice_question_type,What is the capital of France?,,"['Berlin', 'Vilnius']",Paris,True,0,0,0,0
+4,free_form_question_type,what is the capital of Australia?,Canberra,,,True,0,0,0,0
+5,free_form_question_type,How many continents are there in the world?,7,,,True,0,0,0,0
