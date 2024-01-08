@@ -27,27 +27,29 @@ class QuestionManager:
     
 
     def craete_multiple_choice_question(self, question_type, question_text):   
-        # Ask for the number of options, answer options, correct answer option, and if everything is filled, 
-        # save everything in the question_to_be_added list 
         while True:
-            num_options = int(input("Enter the number of answer options: "))
-            if 1 >= int(num_options) <= 5:
-                break
-            else:
-                print("Please enter a valid number between 1 and 5.")
-                #ask again 
-            options = [input(f"Enter incorrect options {i} times: ") for i in range(num_options - 1)]
-            correct_option = input("Now enter the correct option: ")
-            new_question = MultipleChoiceQuestion(
+            try:
+                num_options = int(input("Enter the number of answer options (2-5): "))
+                if 2 <= num_options <= 5:
+                    break
+                else:
+                    print("Please enter a valid number between 2 and 5.")
+            except ValueError:
+                print("Invalid input. Please enter a valid number.")
+
+        options = [input(f"Enter incorrect option {i+1}: ") for i in range(num_options - 1)]
+        correct_option = input("Now enter the correct option: ")
+
+        new_question = MultipleChoiceQuestion(
             id=id,
             question_type=question_type,
             question_text=question_text,
             options=options,
             correct_option=correct_option
         )
-            print("You have prepared the question for saving.")
-            return new_question
 
+        print("You have prepared the question for saving.")
+        return new_question
 
 
 
