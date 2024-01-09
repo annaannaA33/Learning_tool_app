@@ -11,8 +11,9 @@ class Question:
         self.is_active = is_active
         self.appearance_count = appearance_count # How many times it has been displayed during testing + practice
         self.correct_count = correct_count  # Total number of correct answers for this question
-        self.total_correct_percentage = 0  # Overall percentage of correct answers
+        self.total_correct_percentage = 0  # Overall percentage of correct answers for this question in practice and test mood
         self.total_questions = 0 # Total number of questions
+        self.overall_percentage = 0 # Overall Performance Across All Questions
         
 
     def get_question_text(self):
@@ -26,26 +27,28 @@ class Question:
     
     def get_weight(self):
         incorrect_attempts = self.appearance_count - self.correct_count
-        return incorrect_attempts + 1 / (self.correct_count + 1)
+        return incorrect_attempts + 100 / (self.correct_count + 100)
 
 
     def update_statistics(self, load_question_list, is_correct):
         for idx, question in enumerate(load_question_list):
             if question.id == self.id:
-                total_questions = len(load_question_list)
-                question.total_correct_percentage = (question.correct_count / total_questions) * 100 if total_questions > 0 else 0
-                # If the answer is correct, update statistics
                 question.appearance_count +=1
+                # If the answer is correct, update statistics
                 if is_correct:
-                    question.correct_count += 1
-                    question.total_correct_percentage = round((question.correct_count / total_questions) * 100) if total_questions > 0 else 0
-
+                    self.correct_count += 1
                 # Return the updated list of questions
                 return load_question_list
 
         # If the question is not found, return the original list
         return load_question_list
-    
+
+    @classmethod
+    def overall_performance(cls, question_list):
+        total_correct = sum(question.correct_count for question in question_list)
+        total_appearances = sum(question.appearance_count for question in question_list)
+        overall_percentage = (total_correct / total_appearances) * 100
+        return round(overall_percentage, 2)
     
     @classmethod
     def find_active_questions(cls, load_question_list):
@@ -53,7 +56,6 @@ class Question:
         # Iterate through all questions and select the active ones 
         # adding them to the list
         return active_questions_list
-
 
     def check_answer(self, question, user_answer):
         if self.question_type == 'free_form_question_type':
