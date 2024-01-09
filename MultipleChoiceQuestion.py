@@ -1,4 +1,5 @@
 from Question import Question
+from random import shuffle
 
 
 class MultipleChoiceQuestion(Question):
@@ -24,3 +25,7 @@ class MultipleChoiceQuestion(Question):
                 'total_correct_percentage': self.total_correct_percentage,
                  }
     
+    def get_question_text(self):
+        shuffled_options = [self.correct_option] + self.options
+        shuffle(shuffled_options)
+        return f"{super().get_question_text()}\nAnswer Options: {', '.join(shuffled_options)}"
