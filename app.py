@@ -156,12 +156,18 @@ def main_manu(question_manager, file_manager):
             load_question_list = []
             load_question_list = file_manager.load_questions_from_csv()
             file_manager.print_questions_table(load_question_list)
+            total_questions = len(load_question_list)
+            if total_questions == 0:
+                return 0
+            overall_percentage = Question.overall_performance(load_question_list)
+            print(f"Overall Performance Across All Questions: {overall_percentage}%")
+            print(f"Total_questions: {total_questions}")
 
-            
         # Disable/Enable Questions
         elif player_choice == '3':   
             #print the questions from file manager
             file_manager.question_activity_control()
+            
 
         # Practice_mood
         elif player_choice == '4':   
