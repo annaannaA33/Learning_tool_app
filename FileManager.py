@@ -5,63 +5,62 @@ from FreeFormQuestion import FreeFormQuestion
 from typing import Union
 import os
 import csv
-import ast  # additional import KATYA
+import ast
 from tabulate import tabulate
 from colorama import Fore, Style
+from datetime import date
 
 
 class FileManager:
     def __init__(self):
         self.QUESTIONS_FILE = 'questions.csv'
 
-    
-
     def save_questions_to_csv(self, new_question_list):
-        existing_questions = []
+        existing_questions = self.load_questions_from_csv()
         all_updated_questions = []
 
-        # Check if the questions file exists
-        if os.path.exists(self.QUESTIONS_FILE) and os.stat(self.QUESTIONS_FILE).st_size != 0:
-            # f the file exists and is not empty, load the questions
-            existing_questions = self.load_questions_from_csv()
-            for one_existing_question in existing_questions:
-                for one_new_question in new_question_list:
-                    if one_existing_question.question_type == one_new_question.question_type and one_existing_question.question_text == one_new_question.question_text:
-                        one_existing_question.appearance_count += one_new_question.appearance_count
-                        one_existing_question.correct_count += one_new_question.correct_count
-                        one_existing_question.total_correct_percentage += one_new_question.total_correct_percentage
-                        if one_existing_question not in all_updated_questions: 
-                            all_updated_questions.append(one_existing_question)
-                        
-                    else:
-                        if one_existing_question not in all_updated_questions: 
-                            all_updated_questions.append(one_existing_question)
+        for new_question in new_question_list:
+            question_added = False  # Флаг, чтобы проверить, добавлен ли вопрос в all_updated_questions
 
-        # Assign unique IDs
+            for existing_question in existing_questions:
+                if new_question.question_text == existing_question.question_text:
+                    existing_question.appearance_count += new_question.appearance_count
+                    existing_question.correct_count += new_question.correct_count
+                    question_added = True  # Устанавливаем флаг, так как вопрос уже обработан
+                    break
+
+            if not question_added:
+                # Если вопрос не был добавлен, добавляем его в all_updated_questions
+                all_updated_questions.append(new_question)
+
+        # Теперь добавим оставшиеся существующие вопросы, которые не были обработаны
+        all_updated_questions.extend(existing_question for existing_question in existing_questions if
+                                    existing_question not in all_updated_questions)
+
+        # Переопределяем уникальные идентификаторы
         for i, question in enumerate(all_updated_questions, start=1):
             question.id = i
 
-        # Save the updated list of questions to the file
+        # Сохраняем обновленный список вопросов в файл
         self.save_prepeared_questions_to_file(all_updated_questions)
+            
         
     def save_prepeared_questions_to_file(self, all_questions):
         with open(self.QUESTIONS_FILE, mode='w', newline='', encoding='utf-8') as file:
             writer = csv.writer(file)
-            writer.writerow(['id', 'question_type', 'question_text', 'expected_answer', 'options', 'correct_option', 'is_active', 'appearance_count', 'correct_count', 'total_correct_percentage', 'total_questions'])
+            writer.writerow(['id', 'question_type', 'question_text', 'correct_answer', 'options', 'is_active', 'appearance_count', 'correct_count', 'total_correct_percentage'])
 
             for question in all_questions:
                 row_data = {
                     'id': question.id,
                     'question_type': question.question_type,
                     'question_text': question.get_question_text(),
-                    'expected_answer': getattr(question, 'expected_answer', None),
-                    'options': getattr(question, 'options', None),
-                    'correct_option': getattr(question, 'correct_option', None),
+                    'correct_answer': question.correct_answer,
+                    'options': getattr(question, 'options', None),    
                     'is_active': question.get_is_active(),
                     'appearance_count': question.appearance_count,
                     'correct_count': question.correct_count,
                     'total_correct_percentage': question.total_correct_percentage,
-                    'total_questions': getattr(question, 'total_questions', None),
                 }
 
                 writer.writerow([row_data[field] for field in row_data])
@@ -82,6 +81,7 @@ class FileManager:
                 id = int(row['id'])
                 question_type = row['question_type']
                 question_text = row['question_text']
+                correct_answer = row['correct_answer']
                 is_active = row['is_active'].lower() == 'true'
                 appearance_count = int(row['appearance_count'])
                 correct_count = int(row['correct_count'])
@@ -89,12 +89,11 @@ class FileManager:
 
                 # Создание объекта вопроса и добавление его в список
                 if row['question_type'] == 'free_form_question_type':
-                    expected_answer = row['expected_answer']
                     question = FreeFormQuestion(
                         id=id,
                         question_type=question_type,
                         question_text=question_text,
-                        expected_answer = expected_answer,
+                        correct_answer = correct_answer,
                         is_active=is_active,
                         appearance_count=appearance_count,
                         correct_count=correct_count,
@@ -105,13 +104,12 @@ class FileManager:
                 elif row['question_type'] == 'multiple_choice_question_type':
 
                     options = ast.literal_eval(row['options']) if row['options'] else []
-                    correct_option = row['correct_option']
                     question = MultipleChoiceQuestion(
                         id=id,
                         question_type=question_type,
                         question_text=question_text,
+                        correct_answer=correct_answer,
                         options=options,
-                        correct_option=correct_option,
                         is_active=is_active,
                         appearance_count=appearance_count,
                         correct_count=correct_count,
@@ -120,29 +118,29 @@ class FileManager:
                     question_list.append(question)
 
         return question_list
- 
     def print_questions_table(self, questions):
         # Prepare data for tabulation
         table_data = []
         for question in questions:
+            #total_correct_percentage = question.total_correct_percentage
             correct_percentage = (question.correct_count / question.appearance_count) * 100 if question.appearance_count > 0 else 0
 
             # Используем пустую строку, если атрибут отсутствует
-            expected_answer = getattr(question, 'expected_answer', '')
+            correct_answer = getattr(question, 'correct_answer', '')
             options = ', '.join(getattr(question, 'options', []))
-            correct_option = getattr(question, 'correct_option', '')
-
+            
             row = [question.id, question.question_type, "Yes" if question.is_active else "No",
-                question.question_text, expected_answer, options, correct_option,
-                question.appearance_count, f"{correct_percentage:.2f}", question.correct_count]
+                question.question_text, correct_answer, options,
+                question.appearance_count, f"{correct_percentage:.2f} %", question.correct_count]
 
             table_data.append(row)
 
         # Table header
-        headers = ["ID", "Type", "Active", "Question", "Expected Answer", "Options", "Correct Option",
-                "Appearance Count", "Correct %", "Total Correct"]
+        headers = ["ID", "Type", "Active", "Question", "Correct\nanswer", "Options",
+                "Appearance\n Count", "Correct %", "Total\n Correct"]
         colored_headers = [f"{Fore.GREEN}{header}{Style.RESET_ALL}" for header in headers]
         print(tabulate(table_data, headers=colored_headers, tablefmt="pretty"))
+
 
 
     def question_activity_control(self):
@@ -154,7 +152,7 @@ class FileManager:
         while True:
             id_switch = input("Write the ID of the question you want to enable, disable, or delete (or 'main_menu' to return to the main menu): ")
 
-            if id_switch.lower() == "main_menu":
+            if id_switch.lower() == "main_menu" or id_switch.lower() == 'm':
                 # Check for changes and save if there are any
                 self.save_prepeared_questions_to_file(question_list_print)
                 print("Changes have been successfully saved.")
@@ -178,12 +176,11 @@ class FileManager:
                     else:
                         print("Invalid command. Please enter 'enable', 'disable', or 'delete'.")
                 else:
-                    print("Question not found. Enter a valid ID or 'main_menu' to return to the main menu.")
+                    print("Question not found. Enter a valid ID. To return to the main menu type 'm' or 'main_menu'")
             except ValueError:
                 print("Invalid input. Please enter a valid ID or 'main_menu' to return to the main menu.")
     
     def save_test_results(self, result_string):
         with open("results.txt", "a") as file:
             timestamp = datetime.datetime.now().isoformat()
-            file.write(f"{timestamp} - {result_string}\n")           
-
+            file.write(f"{timestamp} - {result_string}\n") 
