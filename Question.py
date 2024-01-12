@@ -28,7 +28,7 @@ class Question:
 
     def get_question_text(self):
         return self.question_text
-
+    
     def get_is_active(self):
         return self.is_active
 
