@@ -3,17 +3,15 @@ from FileManager import FileManager
 from QuestionManager import QuestionManager
 from Question import Question
 from random import choices
-import os
+import os, sys
 
 
 def main():
-  
+
+
     player = Player()
     file_manager = FileManager()
     question_manager = QuestionManager()   
-
-    #questions_list = question_manager.questions
-    #user_data = file_manager.load_user_data()
 
     welcome_player(player)
     main_manu(question_manager, file_manager)
@@ -24,37 +22,29 @@ def __init__(self, load_question_list):
     #if 'name' in user_data:
 #     player.name = user_data['name']
     
-def clear_terminal():
-    # does not work
-    print('\x1bc', end='')
-
-def start_practice(active_questions_list):
+def start_practice(load_question_list, active_questions_list):
     while True:
-        print("You are in practice mode")
-        one_question = Question.random_chose_question(active_questions_list)
-        #print(one_question.get_question_text())
-        if not one_question:
-            print("No active questions available for practice.")
-            break
-        if len(active_questions_list) > 5:
+        
+        if len(active_questions_list) < 5:
             print("To start practicing, there should be at least 5 active questions. Please check the questions list.")
             break
-
+        print("You are in practice mode")
+        print("To return to the main menu, type 'menu' or 'm'")
+        one_question = Question.random_chose_question(active_questions_list)
+        
         user_answer = input(f"{one_question.get_question_text()}:\n ")
 
-        if user_answer.lower() == 'main_manu':
-            # Save statistics and return to the main menu
+        if user_answer.lower() == 'menu' or user_answer.lower() == "m":
+            # Return to the main menu
+            print("Testing mode aborted. Returning to the main menu.")
             break
         elif one_question.check_answer(one_question, user_answer) == True:
             print("Answer is correct")
+            one_question.update_statistics(load_question_list, True)
         else: 
-            print("Answer is incorrect. Correct answer:", one_question.get_correct_answer())
+            one_question.update_statistics(load_question_list, False)
+            print(f"Answer is incorrect. Correct answer: {one_question.get_correct_answer()}")
 
-        one_question.update_statistics()
-        
-
-        # In the end, return the list of questions with updated statistics after returning to the main menu. 
-        #This list will be passed to the main file for updating and loading into the main CSV file
 
 def check(questions_asked, active_questions_list):
         while True:
@@ -67,8 +57,12 @@ def start_test(load_question_list, active_questions_list):
     questions_asked = set()
     num_questions = 0
     print("You are in testing mode")
-    
+    print("To return to the main menu, type 'menu' or 'm'")
+
     while True:
+        if len(active_questions_list) < 5:
+            print("To start practicing, there should be at least 5 active questions. Please check the questions list.")
+            break
         try:
             num_questions = int(input("Enter the number of questions for the test: "))
             if num_questions <= len(active_questions_list):
@@ -82,7 +76,7 @@ def start_test(load_question_list, active_questions_list):
         questions_asked.add(one_question)
         user_answer = input(f"{one_question.get_question_text()}:\n ")
         
-        if user_answer.lower() == 'main_menu':
+        if user_answer.lower() == 'menu' or user_answer.lower() == "m":
             print("Testing mode aborted. Returning to the main menu.")
             break
         if one_question.check_answer(one_question, user_answer):
@@ -95,7 +89,10 @@ def start_test(load_question_list, active_questions_list):
     # Display test results
     accuracy_percentage = (correct / num_questions) * 100 if num_questions > 0 else 0
     result_string = f"{accuracy_percentage:.2f}%"
-    print(f"Test completed. Correct answers: {correct}/{num_questions} ({result_string})")
+    if len(active_questions_list) > 5:
+
+        print(f"Test completed. Correct answers: {correct}/{num_questions} ({result_string})")
+    
     return result_string
 
 
@@ -109,7 +106,7 @@ def print_ruls():
         "4. Practice Mode: Select '4' to practice questions. The program adapts, showing questions answered incorrectly more often.\n"
         "5. Test Mode: Select '5' to take a test. Choose the number of questions, and receive a score with percentages.\n"
         "Note: At least 5 questions must be added before entering practice or test modes.\n\n"
-        "To stop the program and save data, type 'stop' anytime. All data is automatically saved. ")
+        "To stop type 'stop.")
     
 def print_menu():
     menu_options = [
@@ -138,8 +135,8 @@ def main_manu(question_manager, file_manager):
         print_menu()
         player_choice = input("Enter your choice: ")
         if player_choice.lower() == 'stop':
-            print("Exiting the program. Goodbye!")
-            break
+            sys.exit("Exiting the program. Goodbye!")
+            
 
         # Add question, save question
         elif player_choice == '1':
@@ -162,6 +159,7 @@ def main_manu(question_manager, file_manager):
             overall_percentage = Question.overall_performance(load_question_list)
             print(f"Overall Performance Across All Questions: {overall_percentage}%")
             print(f"Total_questions: {total_questions}")
+            
 
         # Disable/Enable Questions
         elif player_choice == '3':   
@@ -174,7 +172,7 @@ def main_manu(question_manager, file_manager):
             load_question_list = []
             load_question_list = file_manager.load_questions_from_csv()
             active_questions_list = Question.find_active_questions(load_question_list)
-            start_practice(active_questions_list)
+            start_practice(load_question_list, active_questions_list)
             updated_load_question_list = load_question_list # with updated statistics
             # Get the updated list with statistics and update file with questions
             file_manager.save_questions_to_csv(updated_load_question_list)
