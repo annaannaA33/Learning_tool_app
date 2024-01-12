@@ -1,6 +1,11 @@
-id,question_type,question_text,expected_answer,options,correct_option,is_active,appearance_count,correct_count,total_correct_percentage,total_questions
-1,multiple_choice_question_type,What is the largest planet in our solar system?,,"['[""[\'Earth\'""', '""\'Mars\']""]']",Jupiter,True,0,0,0,0
-2,free_form_question_type,What is the capital of Lithuania?,Vilnius,,,True,0,0,0,0
-3,multiple_choice_question_type,What is the capital of France?,,"['Berlin', 'Vilnius']",Paris,True,0,0,0,0
-4,free_form_question_type,what is the capital of Australia?,Canberra,,,True,0,0,0,0
-5,free_form_question_type,How many continents are there in the world?,7,,,True,0,0,0,0
+id,question_type,question_text,correct_answer,options,is_active,appearance_count,correct_count,total_correct_percentage
+1,free_form_question_type,Which river is the longest in the world?,Amazon River,,True,0,0,0
+2,free_form_question_type,Which river is the longest in Africa?,Nile River,,True,0,0,0
+3,free_form_question_type,Which river is the longest in Asia?,Yangtze River,,True,0,0,0
+4,multiple_choice_question_type,"What is the name of the world's smallest ocean basin? Answer Options: Arctic Ocean, Mediterranean Sea, Caribbean Sea",Arctic Ocean,"['Mediterranean Sea', 'Caribbean Sea']",True,0,0,0
+5,multiple_choice_question_type,"What is the chemical symbol for oxygen? Answer Options: O, H, C",O,"['H', 'C']",True,0,0,0
+6,multiple_choice_question_type,"What is the largest continent in the world? Answer Options: Asia, Africa, North America",Asia,"['Africa', 'North America']",True,0,0,0
+8,free_form_question_type,What is the capital of France?,Paris,,True,0,0,0
+9,multiple_choice_question_type,"What is the name of the tallest mountain in the world? Answer Options: Mount Everest, Mount Kilimanjaro, Mount Fuji",Mount Everest,"['Mount Kilimanjaro', 'Mount Fuji']",True,0,0,0
+10,multiple_choice_question_type,"What is the name of the largest ocean in the world? Answer Options: Pacific Ocean, Indian Ocean, Atlantic Ocean",Pacific Ocean,"['Indian Ocean', 'Atlantic Ocean']",True,0,0,0
+
