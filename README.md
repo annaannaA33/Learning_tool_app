@@ -27,3 +27,6 @@ Steps to take before starting:
 Install the 'tabulate' package by running the command: pip install tabulate.
 Open the terminal in full view.
 pip install pytest
+
+Application testing:
+During the test I create and save a question in the list, so before restart the test it is important to delete the created question.
