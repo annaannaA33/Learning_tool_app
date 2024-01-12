@@ -4,21 +4,21 @@ from random import choices
 class Question:
     
 
-    def __init__(self, id, question_type, question_text, is_active=True, appearance_count=0, correct_count=0, total_questions = 0):
+    def __init__(self, id, question_type, question_text, correct_answer, is_active=True, appearance_count=0, correct_count=0, total_correct_percentage=0):
         self.id = id 
         self.question_type = question_type
         self.question_text = question_text
+        self.correct_answer = correct_answer
         self.is_active = is_active
         self.appearance_count = appearance_count # How many times it has been displayed during testing + practice
         self.correct_count = correct_count  # Total number of correct answers for this question
         self.total_correct_percentage = 0  # Overall percentage of correct answers for this question in practice and test mood
-        self.total_questions = 0 # Total number of questions
         self.overall_percentage = 0 # Overall Performance Across All Questions
+        self.total_questions = 0 # Total number of questions
         
-
     def get_question_text(self):
         return self.question_text
-
+   
     def get_is_active(self):
         return self.is_active
     
@@ -47,7 +47,7 @@ class Question:
     def overall_performance(cls, question_list):
         total_correct = sum(question.correct_count for question in question_list)
         total_appearances = sum(question.appearance_count for question in question_list)
-        overall_percentage = (total_correct / total_appearances) * 100
+        overall_percentage = (total_correct / total_appearances) * 100 if total_appearances > 0 else 0
         return round(overall_percentage, 2)
     
     @classmethod
@@ -58,13 +58,7 @@ class Question:
         return active_questions_list
 
     def check_answer(self, question, user_answer):
-        if self.question_type == 'free_form_question_type':
-            return user_answer.lower() == question.expected_answer.lower()
-            
-        elif self.question_type == 'multiple_choice_question_type':
-            return user_answer.lower() == question.correct_option.lower()
-        else:
-            return True
+        return user_answer.lower() == question.correct_answer.lower()
         
     @classmethod
     def random_chose_question(cls, active_questions_list):
@@ -84,6 +78,7 @@ class Question:
                 'id': self.id,
                 'question_type': self.question_type,
                 'question_text': self.question_text,
+                'correct_answer': self.correct_answer,
                 'is_active': self.is_active,
                 'appearance_count': self.appearance_count,
                 'correct_count': self.correct_count,
