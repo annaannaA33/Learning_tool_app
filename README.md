@@ -26,3 +26,4 @@ Steps to take before starting:
 
 Install the 'tabulate' package by running the command: pip install tabulate.
 Open the terminal in full view.
+pip install pytest
